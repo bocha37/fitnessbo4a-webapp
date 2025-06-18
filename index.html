@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>БЖУ Калькулятор</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script> 
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+      max-width: 500px;
+      margin: auto;
+      color: #333;
+    }
+    h2 {
+      text-align: center;
+      color: #4a90e2;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    a {
+      display: block;
+      margin-top: 30px;
+      text-align: center;
+      color: #4a90e2;
+      text-decoration: none;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body>
+
+  <h2>🧮 Расчёт БЖУ</h2>
+
+  <form id="bzuForm">
+    <label for="weight">Вес (кг):</label>
+    <input type="number" name="weight" id="weight" required />
+
+    <label for="height">Рост (см):</label>
+    <input type="number" name="height" id="height" required />
+
+    <label for="age">Возраст:</label>
+    <input type="number" name="age" id="age" required />
+
+    <label for="gender">Пол:</label>
+    <select name="gender" id="gender" required>
+      <option value="1">Мужской</option>
+      <option value="2">Женский</option>
+    </select>
+
+    <label for="activity">Уровень активности:</label>
+    <select name="activity" id="activity" required>
+      <option value="1.2">Сидячий</option>
+      <option value="1.375">Минимальная активность</option>
+      <option value="1.55">Средняя активность</option>
+      <option value="1.725">Высокая активность</option>
+      <option value="1.9">Очень высокая</option>
+    </select>
+
+    <label for="goal">Цель:</label>
+    <select name="goal" id="goal" required>
+      <option value="lose">🔥 Похудение</option>
+      <option value="gain">📈 Набор массы</option>
+      <option value="maintain">⚖️ Удержание веса</option>
+    </select>
+
+    <button type="submit" style="margin-top: 20px; background: #4a90e2; color: white; border: none;">Рассчитать</button>
+  </form>
+
+  <div class="result" id="result"></div>
+
+  <a href="question.html">✉️ Задать личный вопрос</a>
+
+  <script>
+    document.getElementById("bzuForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const weight = parseFloat(document.getElementById("weight").value);
+      const height = parseFloat(document.getElementById("height").value);
+      const age = parseInt(document.getElementById("age").value);
+      const gender = document.getElementById("gender").value;
+      const activity = parseFloat(document.getElementById("activity").value);
+      const goal = document.getElementById("goal").value;
+
+      if (!weight || !height || !age || !activity) return alert("Введите все данные!");
+
+      // Формула Mifflin-St Jeor
+      let bmr = (10 * weight) + (6.25 * height) - (5 * age);
+      if (gender === "1") bmr += 5;
+      else bmr -= 161;
+
+      const tdee = Math.round(bmr * activity);
+
+      let calories = tdee;
+      if (goal === "lose") calories = Math.round(tdee * 0.8);
+      if (goal === "gain") calories = Math.round(tdee * 1.2);
+
+      const proteins = Math.round(weight * 2);
+      const fats = Math.round(weight * 0.8);
+      const carbs = Math.max(0, Math.round((calories - proteins * 4 - fats * 9) / 4));
+
+      const resultDiv = document.getElementById("result");
+      resultDiv.innerHTML = `
+        <p><strong>🎯 Цель:</strong> ${goal === 'lose' ? 'Похудение' : goal === 'gain' ? 'Набор массы' : 'Удержание веса'}</p>
+        <p><strong>Калории:</strong> ${calories} ккал</p>
+        <p><strong>Белки:</strong> ${proteins} г</p>
+        <p><strong>Жиры:</strong> ${fats} г</p>
+        <p><strong>Углеводы:</strong> ${carbs} г</p>
+        <p><em>Используйте эти данные для питания!</em></p>
+      `;
+    });
+  </script>
+
+</body>
+</html>
