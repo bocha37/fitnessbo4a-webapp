@@ -2,125 +2,76 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>БЖУ Калькулятор</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Рассчитать БЖУ</title>
   <script src="https://telegram.org/js/telegram-web-app.js"></script> 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      padding: 20px;
-      max-width: 500px;
-      margin: auto;
-      color: #333;
-    }
-    label {
-      display: block;
-      margin-top: 10px;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      margin-top: 5px;
-    }
-    .result {
-      margin-top: 20px;
-      background: #f4f4f4;
-      padding: 15px;
-      border-radius: 8px;
-    }
-    a {
-      display: block;
-      margin-top: 20px;
-      text-decoration: none;
-      color: #4a90e2;
-      text-align: center;
-    }
-  </style>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"  rel="stylesheet">
 </head>
-<body>
+<body class="bg-gray-100 min-h-screen p-6">
+  <div class="bg-white rounded-xl shadow-lg w-full max-w-md mx-auto p-6">
+    <h2 class="text-2xl font-bold text-center text-green-600 mb-6">🧮 Рассчитать БЖУ</h2>
+    <form id="bjuForm" class="space-y-4">
+      <input type="number" name="weight" placeholder="Вес (кг)" required
+             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
 
-  <h2>🧮 Расчёт БЖУ</h2>
+      <input type="number" name="height" placeholder="Рост (см)" required
+             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
 
-  <form id="bzuForm">
-    <label>Вес (кг):</label>
-    <input type="number" name="weight" id="weight" required />
+      <input type="number" name="age" placeholder="Возраст" required
+             class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500" />
 
-    <label>Рост (см):</label>
-    <input type="number" name="height" id="height" required />
+      <select name="gender" required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+        <option value="">Выберите пол</option>
+        <option value="male">Мужской</option>
+        <option value="female">Женский</option>
+      </select>
 
-    <label>Возраст:</label>
-    <input type="number" name="age" id="age" required />
+      <button type="submit"
+              class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
+        Рассчитать
+      </button>
+    </form>
 
-    <label>Пол:</label>
-    <select name="gender" id="gender" required>
-      <option value="1">Мужской</option>
-      <option value="2">Женский</option>
-    </select>
-
-    <label>Активность:</label>
-    <select name="activity" id="activity" required>
-      <option value="1.2">Сидячий</option>
-      <option value="1.375">Минимальная</option>
-      <option value="1.55">Средняя</option>
-      <option value="1.725">Высокая</option>
-      <option value="1.9">Очень высокая</option>
-    </select>
-
-    <label>Цель:</label>
-    <select name="goal" id="goal" required>
-      <option value="lose">🔥 Похудение</option>
-      <option value="gain">📈 Набор массы</option>
-      <option value="maintain">⚖️ Удержание веса</option>
-    </select>
-
-    <button type="submit">Рассчитать</button>
-  </form>
-
-  <div class="result" id="result"></div>
-
-  <a href="question.html">✉️ Задать личный вопрос</a>
+    <div id="result" class="mt-6 text-center hidden">
+      <p class="font-medium">Ваша норма:</p>
+      <p class="text-blue-600">Калории: <span id="calories"></span></p>
+      <p class="text-red-600">Белки: <span id="proteins"></span> г</p>
+      <p class="text-yellow-600">Жиры: <span id="fats"></span> г</p>
+      <p class="text-blue-400">Углеводы: <span id="carbs"></span> г</p>
+    </div>
+  </div>
 
   <script>
-    document.getElementById("bzuForm").addEventListener("submit", function(e) {
+    document.getElementById("bjuForm").addEventListener("submit", async function(e) {
       e.preventDefault();
-      const weight = parseFloat(document.getElementById("weight").value);
-      const height = parseFloat(document.getElementById("height").value);
-      const age = parseInt(document.getElementById("age").value);
-      const gender = document.getElementById("gender").value;
-      const activity = parseFloat(document.getElementById("activity").value);
-      const goal = document.getElementById("goal").value;
+      const formData = new FormData(this);
+      const weight = parseFloat(formData.get("weight"));
+      const height = parseFloat(formData.get("height"));
+      const age = parseInt(formData.get("age"));
+      const gender = formData.get("gender");
 
-      if (!weight || !height || !age || !activity) {
-        alert("Введите все данные!");
+      if (!weight || !height || !age || !gender) {
+        alert("Заполните все поля");
         return;
       }
 
-      // Формула Mifflin-St Jeor
-      let bmr = (10 * weight) + (6.25 * height) - (5 * age);
-      if (gender === "1") bmr += 5; else bmr -= 161;
+      let bmr = gender === "male"
+        ? 10 * weight + 6.25 * height - 5 * age + 5
+        : 10 * weight + 6.25 * height - 5 * age - 161;
 
-      const tdee = Math.round(bmr * activity);
+      bmr *= 1.4; // Средняя активность
 
-      let calories = tdee;
-      if (goal === "lose") calories = Math.round(tdee * 0.8);
-      if (goal === "gain") calories = Math.round(tdee * 1.2);
-
-      const proteins = Math.round(weight * 2);
+      const proteins = Math.round(weight * 1.6); // Пример: 1.6 г белков на кг веса
       const fats = Math.round(weight * 0.8);
-      const carbs = Math.max(0, Math.round((calories - proteins * 4 - fats * 9) / 4));
+      const carbs = Math.round((bmr - proteins * 4 - fats * 9) / 4);
 
-      const resultDiv = document.getElementById("result");
-      resultDiv.innerHTML = `
-        <p><strong>🎯 Цель:</strong> ${goal === 'lose' ? 'Похудение' : goal === 'gain' ? 'Набор массы' : 'Удержание'}</p>
-        <p><strong>Калории:</strong> ${calories} ккал</p>
-        <p><strong>Белки:</strong> ${proteins} г</p>
-        <p><strong>Жиры:</strong> ${fats} г</p>
-        <p><strong>Углеводы:</strong> ${carbs} г</p>
-      `;
+      document.getElementById("calories").textContent = Math.round(bmr);
+      document.getElementById("proteins").textContent = proteins;
+      document.getElementById("fats").textContent = fats;
+      document.getElementById("carbs").textContent = carbs;
+      document.getElementById("result").classList.remove("hidden");
     });
   </script>
-
 </body>
 </html>
