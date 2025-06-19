@@ -44,7 +44,7 @@
         const userId = user.id;
 
         // Отправляем запрос на сервер (Render/Railway)
-        await fetch('https://fitnessbo4a-webapp.vercel.app/question.html',  {
+        await fetch('https://your-bot-server.onrender.com/question',  {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ question: questionText, user_id: userId })
@@ -73,7 +73,7 @@ document.getElementById("questionForm").addEventListener("submit", async functio
   const question = this.question.value;
 
   // ❗ Замени на URL твоего сервера
-  const serverUrl = "https://your-bot-server.onrender.com/question"; 
+  const serverUrl = "https://fitnessbo4a-webapp.vercel.app/question.html"; 
 
   await fetch(serverUrl, {
     method: "POST",
