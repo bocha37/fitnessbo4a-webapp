@@ -27,6 +27,16 @@
         <option value="female">Женский</option>
       </select>
 
+      <select name="activity" required
+              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+        <option value="">Уровень активности</option>
+        <option value="1.2">Минимальная активность</option>
+        <option value="1.375">Легкая активность (1–3 раза в неделю)</option>
+        <option value="1.55">Средняя активность (3–5 раз в неделю)</option>
+        <option value="1.725">Высокая активность (6–7 раз в неделю)</option>
+        <option value="1.9">Очень высокая активность</option>
+      </select>
+
       <button type="submit"
               class="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
         Рассчитать
@@ -50,8 +60,9 @@
       const height = parseFloat(formData.get("height"));
       const age = parseInt(formData.get("age"));
       const gender = formData.get("gender");
+      const activity = parseFloat(formData.get("activity"));
 
-      if (!weight || !height || !age || !gender) {
+      if (!weight || !height || !age || !gender || !activity) {
         alert("Заполните все поля");
         return;
       }
@@ -60,13 +71,12 @@
         ? 10 * weight + 6.25 * height - 5 * age + 5
         : 10 * weight + 6.25 * height - 5 * age - 161;
 
-      bmr *= 1.4; // Средняя активность
-
-      const proteins = Math.round(weight * 1.6); // Пример: 1.6 г белков на кг веса
+      const calories = Math.round(bmr * activity);
+      const proteins = Math.round(weight * 1.6); // Пример: 1.6 г на кг веса
       const fats = Math.round(weight * 0.8);
-      const carbs = Math.round((bmr - proteins * 4 - fats * 9) / 4);
+      const carbs = Math.round((calories - proteins * 4 - fats * 9) / 4);
 
-      document.getElementById("calories").textContent = Math.round(bmr);
+      document.getElementById("calories").textContent = calories;
       document.getElementById("proteins").textContent = proteins;
       document.getElementById("fats").textContent = fats;
       document.getElementById("carbs").textContent = carbs;
