@@ -58,6 +58,9 @@
       <p class="text-yellow-600">Жиры: <span id="fats"></span> г</p>
       <p class="text-blue-400">Углеводы: <span id="carbs"></span> г</p>
       <div id="ration" class="mt-4 text-left text-sm text-gray-700"></div>
+      <button id="showPlanButton" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-lg hidden">
+        Хочу план питания на неделю
+      </button>
     </div>
   </div>
 
@@ -143,7 +146,20 @@
       }
 
       rationDiv.innerHTML = rationText;
+
+      // Показываем кнопку
+      const planButton = document.getElementById("showPlanButton");
+      planButton.classList.remove("hidden");
       document.getElementById("result").classList.remove("hidden");
+    });
+
+    // Нажатие на кнопку "Хочу план питания на неделю"
+    document.getElementById("showPlanButton").addEventListener("click", () => {
+      // Можно открыть другую страницу WebApp
+      window.location.href = "/week-plan.html"; // или внешний URL: "https://fitnessbo4a-webapp.vercel.app/week-plan.html" 
+
+      // Либо открыть Telegram-бота с формой:
+      // window.location.href = "https://t.me/your_bot_username?start=plan";
     });
   </script>
 </body>
